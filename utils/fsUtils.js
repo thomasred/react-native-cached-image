@@ -21,18 +21,19 @@ function getDirPath(path) {
 function ensurePath(path) {
     const dirPath = getDirPath(path);
     return fs.isDir(dirPath)
-        .then(isDir => {
-            if (!isDir) {
-                return fs.mkdir(dirPath)
-                    // check if dir has indeed been created because
-                    // there's no exception on incorrect user-defined paths (?)...
-                    .then(() => fs.isDir(dirPath))
-                    .then(isDir => {
-                        if (!isDir) {
-                            throw new Error('Invalid cacheLocation');
-                        }
-                    })
-            }
+          .then(isDir => {
+            // issue here => react-native-cached-image/issues/134
+            // if (!isDir) {
+            //     return fs.mkdir(dirPath)
+            //         // check if dir has indeed been created because
+            //         // there's no exception on incorrect user-defined paths (?)...
+            //         .then(() => fs.isDir(dirPath))
+            //         .then(isDir => {
+            //             if (!isDir) {
+            //                 throw new Error('Invalid cacheLocation');
+            //             }
+            //         })
+            // }
         })
         .catch(err => {
             // ignore folder already exists errors
@@ -94,7 +95,8 @@ module.exports = {
             activeDownloads[toFile] = ensurePath(toFile)
                 .then(() => RNFetchBlob
                     .config({
-                        path: tmpFile
+                        path: tmpFile,
+                        trusty : true
                     })
                     .fetch('GET', fromUrl, headers)
                     .then(res => {
